@@ -3,6 +3,7 @@ import os
 import codecs
 import collections
 from six.moves import cPickle
+from datetime import datetime
 import numpy as np
 import re
 import itertools
@@ -14,9 +15,9 @@ class TextLoader():
         self.seq_length = seq_length
 
         inputFiles = []
-        for i in range(0, 16):
-            filename = "1-{}.text".format(i)
-            inputFiles[i] = os.path.join(data_dir, filename)
+        for i in range(1, 16):
+            filename = "1-{}.txt".format(i)
+            inputFiles.append(os.path.join(data_dir, filename))
         vocab_file = os.path.join(data_dir, "vocab.pkl")
         tensor_file = os.path.join(data_dir, "data.npy")
 
@@ -70,18 +71,21 @@ class TextLoader():
 
         return arr
 
-    def preprocess(self, input_file, vocab_file, tensor_file, encoding):
-        x_text = None;
+    def preprocess(self, input_file, vocab_file, tensor_file, encoding, errors = "ignore"):
+        x_text = [];
         for i in range(len(input_file)):
-            with codecs.open(input_file, "r", encoding=encoding) as f:
+            filename = input_file[i]
+            with codecs.open(filename, "r", encoding=encoding, errors=errors) as f:
                 data = f.read()
             # Optional text cleaning or make them lower case, etc.
             #data = self.clean_str(data)
             #x_text = self.removeWords(data.split(), ["<EOS>"])
-            x_text = data.split()
+            x_text = x_text + data.split()
+            print("Loaded file: {}".format(filename))
 
         self.vocab, self.words = self.build_vocab(x_text)
         self.vocab_size = len(self.words)
+        print(str(datetime.now()))
 
         with open(vocab_file, 'wb') as f:
             cPickle.dump(self.words, f)

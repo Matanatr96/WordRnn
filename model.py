@@ -41,7 +41,6 @@ class Model():
         tf.summary.scalar("time_batch", self.batch_time)
 
         def variable_summaries(var):
-            """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
             with tf.name_scope('summaries'):
                 mean = tf.reduce_mean(var)
                 tf.summary.scalar('mean', mean)
