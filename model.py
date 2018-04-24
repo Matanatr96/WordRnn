@@ -90,30 +90,6 @@ class Model():
             s = np.sum(weights)
             return(int(np.searchsorted(t, np.random.rand(1)*s)))
 
-        def beam_search_predict(sample, state):
-            """Returns the updated probability distribution (`probs`) and
-            `state` for a given `sample`. `sample` should be a sequence of
-            vocabulary labels, with the last word to be tested against the RNN.
-            """
-
-            x = np.zeros((1, 1))
-            x[0, 0] = sample[-1]
-            feed = {self.input_data: x, self.initial_state: state}
-            [probs, final_state] = sess.run([self.probs, self.final_state],
-                                            feed)
-            return probs, final_state
-
-        def beam_search_pick(prime, width):
-            """Returns the beam search pick."""
-            if not len(prime) or prime == ' ':
-                prime = random.choice(list(vocab.keys()))
-            prime_labels = [vocab.get(word, 0) for word in prime.split()]
-            bs = BeamSearch(beam_search_predict,
-                            sess.run(self.cell.zero_state(1, tf.float32)),
-                            prime_labels)
-            samples, scores = bs.search(None, None, k=width, maxsample=num)
-            return samples[np.argmin(scores)]
-
         ret = ''
         if pick == 1:
             state = sess.run(self.cell.zero_state(1, tf.float32))
@@ -124,7 +100,9 @@ class Model():
 
             ret = prime
             word = prime.split()[-1]
-            for n in range(num):
+            for n in range(2000):
+                if word == '<EOS>':
+                    return ret
                 x = np.zeros((1, 1))
                 x[0, 0] = vocab.get(word, 0)
 
@@ -135,8 +113,4 @@ class Model():
                 pred = words[sample]
                 ret += ' ' + pred
                 word = pred
-        elif pick == 2:
-            pred = beam_search_pick(prime, width)
-            for i, label in enumerate(pred):
-                ret += ' ' + words[label] if i > 0 else words[label]
         return ret
