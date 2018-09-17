@@ -9,6 +9,8 @@ import re
 import itertools
 
 class TextLoader():
+    #generalize for multiple data sources
+    #need to train with many other word sources (should be used with reddit posts hopefully)
     def __init__(self, data_dir, batch_size, seq_length, encoding=None):
         self.data_dir = data_dir
         self.batch_size = batch_size
