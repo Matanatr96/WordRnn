@@ -18,3 +18,8 @@ python sample.py --pick 2 --width 4
 ```
 
 Refer to sample.py for all editable parameters
+
+# Updating trained model
+```bash
+python train.py --init_from /save
+```
